@@ -10,6 +10,7 @@ DOPLOTS = True
 ## Model
 NAME = 'TR-Full'
 smodfull.Model(NAME+'.psc')
+SIM_MODE = 'time'
 
 ## Time for simulations
 LENGTH = 10**3
@@ -23,7 +24,7 @@ smodfull.ChangeParameter("ktranslation",TRANSLATION)
 smodfull.ChangeParameter("ktranslation",TRANSLATION)
 
 
-smodfull.DoStochSim(trajectories=SAMPLES,end=LENGTH,mode='steps') 
+smodfull.DoStochSim(trajectories=SAMPLES,end=LENGTH,mode=SIM_MODE) 
 
 protein_avg_smodfull = smodfull.data_stochsim.species_means["Protein"]
 protein_stdev_smodfull = smodfull.data_stochsim.species_standard_deviations["Protein"]
