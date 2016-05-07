@@ -28,25 +28,36 @@ smodfull.Model(NAME+'.psc')
 SIM_MODE = 'time'
 
 ## Time for simulations
-LENGTH = 10**5
-SAMPLES = 1 # Ergodic
+LENGTH = 10**2
+SAMPLES = 100 
 
+THRESHOLD_PROTEIN = 200
 
 if(TRANSLATION != None):
 	smodfull.ChangeParameter("ktranslation",TRANSLATION)
 if(len(ARGV) == 3):
 	smodfull.ChangeParameter("ktranscription",TRANSCRIPTION)
 
-smodfull.DoStochSim(trajectories=SAMPLES,end=LENGTH,mode=SIM_MODE) 
+PROBAB = 0.0
 
-protein_avg_smodfull = smodfull.data_stochsim.species_means["Protein"]
-protein_stdev_smodfull = smodfull.data_stochsim.species_standard_deviations["Protein"]
-protein_var_smodfull = protein_stdev_smodfull * protein_stdev_smodfull
+for s in range(SAMPLES):
+	smodfull.DoStochSim(trajectories=1,end=LENGTH,mode=SIM_MODE) 
 
-print (NAME == 'TR-Full') & DOPLOTS
-print (NAME == 'TR-NoTranscr') & DOPLOTS
-print DOPLOTS
+	times = smodfull.data_stochsim.getTime()
 
+	for r in range(len(times)):
+		if(smodfull.data_stochsim.getDataAtTime(times[r])[0][1] > THRESHOLD_PROTEIN):
+			PROBAB = PROBAB + 1
+			break
+
+print "Outcomes: ", PROBAB
+
+PROBAB = PROBAB / SAMPLES
+
+print "P: ", PROBAB
+
+
+ 
 ################################################# Traces Plot 
 if( (NAME == 'TR-Full') & DOPLOTS ):
 	print "Plotting"
@@ -107,11 +118,6 @@ if( (NAME == 'TR-NoTranscr') & DOPLOTS):
 	smodfull.PlotSpeciesDistributions(species2plot = ["Protein"],  colors = ["green"])
 
 
-with open("results/m_averages.csv", "a") as myfile:
-		print "Average logged to : ", str(protein_avg_smodfull) 
-		myfile.write(str(protein_avg_smodfull)  + "\n")
-
-with open("results/m_variances.csv", "a") as myfile:
-		print "Average logged to : ", str(protein_var_smodfull) 
-		myfile.write(str(protein_var_smodfull)  + "\n")
-
+with open("results/m_PROBAB.csv", "a") as myfile:
+ 		print "Average logged to : ", str(PROBAB) 
+ 		myfile.write(str(PROBAB)  + "\n")
